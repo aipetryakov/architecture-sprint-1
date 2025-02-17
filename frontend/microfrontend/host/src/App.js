@@ -4,10 +4,12 @@ import ReactDOM from "react-dom/client";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import api from "./utils/api";
-import { CurrentUserContext } from "./contexts/CurrentUserContext";
+import { CurrentUserContext } from "@contexts/CurrentUserContext";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import InfoTooltip from "./components/InfoTooltip";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Main from "./components/Main";
 
 const Login = lazy(() => import('auth/Login')); 
 const Register = lazy(() => import('auth/Register')); 
@@ -23,6 +25,15 @@ const App = () => {
   const [tooltipText, setToolipText] = React.useState("");
 
   const history = useHistory();
+
+  useEffect(() => {
+    api
+      .getUserInfo()
+      .then((userData) => {
+        setCurrentUser(userData);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   function onRegisterSuccessful() {
     setTooltipStatus("success");
@@ -63,9 +74,13 @@ const App = () => {
     setIsLoggedIn(false);
     history.push("/signin");
   }
+
+  function updateCurrentUser(user) {
+    setCurrentUser(user);
+  }
   
   return (
-    <CurrentUserContext.Provider value={currentUser}>
+    <CurrentUserContext.Provider value={{currentUser: currentUser, updateCurrentUser: updateCurrentUser}}>
       <AuthState
         onExistingTokenValid={onExistingTokenValid}
         onExistingTokenInvalid={onExistingTokenInvalid}
@@ -73,6 +88,12 @@ const App = () => {
       <div className="page__content">
         <Header email={email} onLogout={onLogout} />
         <Switch>
+        <ProtectedRoute
+            exact
+            path="/"
+            component={Main}
+            loggedIn={isLoggedIn}
+          />
           <Route path="/signup">
             <Suspense>
               <Register

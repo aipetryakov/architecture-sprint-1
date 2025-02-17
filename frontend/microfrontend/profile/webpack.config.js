@@ -9,7 +9,7 @@ const printCompilationMessage = require('./compilation.config.js');
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3000/",
+    publicPath: "http://localhost:8083/",
   },
 
   resolve: {
@@ -20,7 +20,7 @@ module.exports = (_, argv) => ({
   },
 
   devServer: {
-    port: 3000,
+    port: 8083,
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, 'src')],
     onListening: function (devServer) {
@@ -54,18 +54,6 @@ module.exports = (_, argv) => ({
         use: ["style-loader", "css-loader", "postcss-loader"],
       },
       {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[hash].[ext]',
-              outputPath: 'images',
-            },
-          },
-        ],
-      },
-      {
         test: /\.(ts|tsx|js|jsx)$/,
         exclude: /node_modules/,
         use: {
@@ -77,14 +65,12 @@ module.exports = (_, argv) => ({
 
   plugins: [
     new ModuleFederationPlugin({
-      name: "host",
+      name: "profile",
       filename: "remoteEntry.js",
-      remotes: {
-        'auth': 'auth@http://localhost:8081/remoteEntry.js',
-        'places': 'places@http://localhost:8082/remoteEntry.js',
-        'profile': 'profile@http://localhost:8083/remoteEntry.js',
+      remotes: {},
+      exposes: {
+        './Profile': './src/components/Profile.js',
       },
-      exposes: {},
       shared: {
         ...deps,
         react: {
