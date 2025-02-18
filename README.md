@@ -29,6 +29,6 @@ docker compose -f ./frontend/microfrontend/compose.yaml up
 ## Ссылка на файл draw.io
 
 ```
-https://bla.bla
+https://cloud.mail.ru/public/i4nQ/Qabupahc5 
 ```
 
